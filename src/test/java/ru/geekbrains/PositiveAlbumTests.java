@@ -7,13 +7,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CreateAlbumTests extends BaseTest {
+public class PositiveAlbumTests extends BaseTest {
     private static String imageHash;
     private static String imageHash2;
     private static String albumHash;
-    private String responseString;
+    private static String responseString;
 
-    @Test    @Order(1)
+    @Test
+    @Order(1)
     void uploadImageFromUrlForAlbumTest() {
         imageHash=given()
                 .headers(headers)
