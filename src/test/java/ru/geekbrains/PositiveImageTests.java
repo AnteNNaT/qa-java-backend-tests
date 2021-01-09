@@ -2,6 +2,7 @@ package ru.geekbrains;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.*;
+import ru.geekbrains.base.test.BaseTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.util.Base64;
 import java.util.Objects;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -19,7 +19,6 @@ public class PositiveImageTests extends BaseTest {
     private static String imageHash;
     private static String imageHash2;
     private static String imageHash3;
-    private static String responseFavoritesString;
 
     @BeforeAll
     static void setUp() {
@@ -34,15 +33,13 @@ public class PositiveImageTests extends BaseTest {
                 .headers(headers)
                 .multiPart("image", encodedImage)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/png"))
                 .when()
                 .post("/image")
                 .prettyPeek()
                 .then()
-                .statusCode(200)
+                .spec(responseSpec)
                 .extract()
                 .response()
                 .jsonPath()
@@ -57,15 +54,13 @@ public class PositiveImageTests extends BaseTest {
                 .headers(headers)
                 .multiPart("image", imageNatureUrl)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/jpeg"))
                 .when()
                 .post("/image")
                 .prettyPeek()
                 .then()
-                .statusCode(200)
+                .spec(responseSpec)
                 .extract()
                 .response()
                 .jsonPath()
@@ -80,15 +75,13 @@ public class PositiveImageTests extends BaseTest {
                 .headers(headers)
                 .multiPart("image", imageGifUrl)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/gif"))
                 .when()
                 .post("/image")
                 .prettyPeek()
                 .then()
-                .statusCode(200)
+                .spec(responseSpec)
                 .extract()
                 .response()
                 .jsonPath()
@@ -102,13 +95,11 @@ public class PositiveImageTests extends BaseTest {
         given()
                 .headers(headers)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .when()
                 .get("/image/{Id}", imageHash2)
                 //.prettyPeek()
                 .then()
-                .statusCode(200)
+                .spec(responseSpec)
                 .log()
                 .status();
     }
@@ -121,14 +112,11 @@ public class PositiveImageTests extends BaseTest {
                 .multiPart("title", imageTitle)
                 .multiPart("description", imageDescription)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .body("data", is(true))
                 .when()
                 .post("/image/{imageHash}", imageHash)
-                //.prettyPeek()
                 .then()
-                .statusCode(200)
+                .spec(responseSpec)
                 .log()
                 .status();
     }
@@ -139,15 +127,12 @@ public class PositiveImageTests extends BaseTest {
         given()
                 .headers(headers)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .body("data.title", is(imageTitle))
                 .body("data.description", is(imageDescription))
                 .when()
                 .get("/image/{Id}", imageHash)
-                //.prettyPeek()
                 .then()
-                .statusCode(200)
+                .spec(responseSpec)
                 .log()
                 .status();
     }
@@ -158,14 +143,11 @@ public class PositiveImageTests extends BaseTest {
         given()
                 .headers(headers)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .body("data", is("favorited"))
                 .when()
                 .post("/image/{imageHash2}/favorite", imageHash2)
-                //.prettyPeek()
                 .then()
-                .statusCode(200)
+                .spec(responseSpec)
                 .log()
                 .status();
     }
@@ -173,21 +155,16 @@ public class PositiveImageTests extends BaseTest {
     @Test
     @Order(8)
     void getAccountFavoritesTest() {
-        responseFavoritesString = given()
+        given()
                 .headers(headers)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
+                .body(containsString(imageHash2))
                 .when()
                 .get("/account/{username}/favorites", accountUrl)
-                //.prettyPeek()
                 .then()
-                .statusCode(200)
-                .extract()
-                .response()
-                .jsonPath()
-                .getString("data");
-        assertThat(responseFavoritesString, containsString(imageHash2));
+                .spec(responseSpec)
+                .log()
+                .status();
     }
 
     @Test
@@ -196,13 +173,13 @@ public class PositiveImageTests extends BaseTest {
         given()
                 .headers("Authorization", token)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .when()
                 .delete("/image/{imageHash}", imageHash)
                 .prettyPeek()
                 .then()
-                .statusCode(200);
+                .spec(responseSpec)
+                .log()
+                .status();
     }
 
     @Test
@@ -223,23 +200,19 @@ public class PositiveImageTests extends BaseTest {
         given()
                 .headers("Authorization", token)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .when()
                 .delete("/image/{imageHash}", imageHash2)
                 .prettyPeek()
                 .then()
-                .statusCode(200);
+                .spec(responseSpec);
         given()
                 .headers("Authorization", token)
                 .expect()
-                .body("success", is(true))
-                .body("status", is(200))
                 .when()
                 .delete("/image/{imageHash}", imageHash3)
                 .prettyPeek()
                 .then()
-                .statusCode(200);
+                .spec(responseSpec);
     }
 
 
