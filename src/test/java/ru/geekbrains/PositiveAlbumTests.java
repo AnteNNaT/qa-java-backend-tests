@@ -14,7 +14,6 @@ public class PositiveAlbumTests extends BaseTest {
     private static String albumHash;
     private static String responseString;
 
-
     @Test
     @Order(1)
     void uploadImageFromUrlForAlbumTest() {
