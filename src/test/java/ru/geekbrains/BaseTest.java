@@ -26,6 +26,8 @@ public abstract class BaseTest {
     protected static String imageTitle;
     protected static String imageDescription;
     protected static String imageGifUrl;
+    protected static String updatedAlbumTitle;
+    protected static String updatedAlbumDescription;
 
     @BeforeAll
     static void beforeAll() {
@@ -38,6 +40,8 @@ public abstract class BaseTest {
         imageDescription=prop.getProperty("imageDescription");
         imageNatureUrl=prop.getProperty("imageNatureUrl");
         imageGifUrl=prop.getProperty("imageGifUrl");
+        updatedAlbumTitle=prop.getProperty("updatedAlbumTitle");
+        updatedAlbumDescription=prop.getProperty("updatedAlbumDescription");
         headers.put("Authorization", token);
         RestAssured.baseURI=prop.getProperty("base.url");
 

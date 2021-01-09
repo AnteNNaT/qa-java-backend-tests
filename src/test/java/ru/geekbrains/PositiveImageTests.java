@@ -15,31 +15,29 @@ import static org.hamcrest.Matchers.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PositiveImageTests extends BaseTest {
 
-     private static String encodedImage;
+    private static String encodedImage;
     private static String imageHash;
     private static String imageHash2;
     private static String imageHash3;
     private static String responseFavoritesString;
 
-
-
     @BeforeAll
-      static void setUp() {
+    static void setUp() {
         byte[] fileContent = getFileContentInBase64();
-        encodedImage=Base64.getEncoder().encodeToString(fileContent);
+        encodedImage = Base64.getEncoder().encodeToString(fileContent);
     }
-
 
     @Test
     @Order(1)
     void uploadPngImageFromFileTest() {
-         imageHash=given()
+        imageHash = given()
                 .headers(headers)
                 .multiPart("image", encodedImage)
                 .expect()
                 .body("success", is(true))
+                .body("status", is(200))
                 .body("data.id", is(notNullValue()))
-                 .body("data.type", is("image/png"))
+                .body("data.type", is("image/png"))
                 .when()
                 .post("/image")
                 .prettyPeek()
@@ -55,11 +53,12 @@ public class PositiveImageTests extends BaseTest {
     @Test
     @Order(2)
     void uploadJpegImageFromUrlTest() {
-        imageHash2=given()
+        imageHash2 = given()
                 .headers(headers)
                 .multiPart("image", imageNatureUrl)
                 .expect()
                 .body("success", is(true))
+                .body("status", is(200))
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/jpeg"))
                 .when()
@@ -77,11 +76,12 @@ public class PositiveImageTests extends BaseTest {
     @Test
     @Order(3)
     void uploadGifImageFromUrlTest() {
-        imageHash3=given()
+        imageHash3 = given()
                 .headers(headers)
                 .multiPart("image", imageGifUrl)
                 .expect()
                 .body("success", is(true))
+                .body("status", is(200))
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/gif"))
                 .when()
@@ -141,7 +141,7 @@ public class PositiveImageTests extends BaseTest {
                 .expect()
                 .body("success", is(true))
                 .body("status", is(200))
-                .body("data.title", is (imageTitle))
+                .body("data.title", is(imageTitle))
                 .body("data.description", is(imageDescription))
                 .when()
                 .get("/image/{Id}", imageHash)
@@ -173,7 +173,7 @@ public class PositiveImageTests extends BaseTest {
     @Test
     @Order(8)
     void getAccountFavoritesTest() {
-        responseFavoritesString=given()
+        responseFavoritesString = given()
                 .headers(headers)
                 .expect()
                 .body("success", is(true))
@@ -187,7 +187,7 @@ public class PositiveImageTests extends BaseTest {
                 .response()
                 .jsonPath()
                 .getString("data");
-        assertThat(responseFavoritesString,containsString(imageHash2));
+        assertThat(responseFavoritesString, containsString(imageHash2));
     }
 
     @Test
@@ -205,9 +205,22 @@ public class PositiveImageTests extends BaseTest {
                 .statusCode(200);
     }
 
+    @Test
+    @Order(10)
+    void checkImageDeletionTest() {
+        given()
+                .headers(headers)
+                .when()
+                .get("/image/{Id}", imageHash)
+                .then()
+                .statusCode(404)
+                .log()
+                .status();
+    }
+
     @AfterAll
     static void tearDown() {
-           given()
+        given()
                 .headers("Authorization", token)
                 .expect()
                 .body("success", is(true))
@@ -231,11 +244,11 @@ public class PositiveImageTests extends BaseTest {
 
 
     private static byte[] getFileContentInBase64() {
-        ClassLoader classLoader= PositiveImageTests.class.getClassLoader();
-        File inputFile=new File(Objects.requireNonNull(classLoader.getResource(imageFileName).getFile()));
-        byte[] fileContent =new byte[0];
+        ClassLoader classLoader = PositiveImageTests.class.getClassLoader();
+        File inputFile = new File(Objects.requireNonNull(classLoader.getResource(imageFileName).getFile()));
+        byte[] fileContent = new byte[0];
         try {
-            fileContent= FileUtils.readFileToByteArray(inputFile);
+            fileContent = FileUtils.readFileToByteArray(inputFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
