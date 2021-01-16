@@ -82,20 +82,18 @@ public abstract class BaseTest {
                 .expectBody("status", is(400))
                 .build();
 
-        negative404ResponseSpec=new ResponseSpecBuilder()
+        negative404ResponseSpec = new ResponseSpecBuilder()
                 .expectStatusCode(404)
                 .expectContentType(ContentType.HTML)
                 .build();
 
-        requestSpec=new RequestSpecBuilder()
+        requestSpec = new RequestSpecBuilder()
                 .addHeaders(headers)
                 .setAccept(ContentType.JSON)
-               // .setContentType(ContentType.ANY)
                 .log(LogDetail.ALL)
                 .build();
 
-        RestAssured.requestSpecification=requestSpec;
-        //RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.requestSpecification = requestSpec;
     }
 
     protected static String getFileContentInBase64String(File fileName) {

@@ -1,13 +1,9 @@
 package ru.geekbrains;
 
 import io.restassured.RestAssured;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.*;
 import ru.geekbrains.base.test.BaseTest;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Base64;
+import ru.geekbrains.service.Endpoints;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -25,16 +21,8 @@ public class PositiveImageTests extends BaseTest {
 
     @BeforeAll
     static void setUp() {
-        // byte[] fileContent = FileUtils.readFileToByteArray(imageFileName);
         encodedImage = getFileContentInBase64String(imageFileName);
         encodedSmallImage = getFileContentInBase64String(smallImageFile);
-        // byte[] fileContent = getFileContentInBase64(imageFileName);
-        // encodedImage = Base64.getEncoder().encodeToString(fileContent);
-        //byte[] emptyFileContent = getFileContentInBase64(emptyImageFileName);
-        //encodedEmptyimage=Base64.getEncoder().encodeToString(emptyFileContent);
-        //byte[] fileContent2 = FileUtils.readFileToByteArray(smallImageFile);
-        //encodedSmallImage = Base64.getEncoder().encodeToString(fileContent2);
-
         RestAssured.responseSpecification = responseSpec;
     }
 
@@ -47,7 +35,7 @@ public class PositiveImageTests extends BaseTest {
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/png"))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -66,7 +54,7 @@ public class PositiveImageTests extends BaseTest {
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/jpeg"))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -86,7 +74,7 @@ public class PositiveImageTests extends BaseTest {
                 .body("data.type", is("image/gif"))
                 .body("data.animated", is(false))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -106,7 +94,7 @@ public class PositiveImageTests extends BaseTest {
                 .body("data.type", is("image/gif"))
                 .body("data.animated", is(true))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -115,6 +103,7 @@ public class PositiveImageTests extends BaseTest {
                 .getString("data.id");
 
     }
+
     @Test
     @Order(5)
     void upload1x1PixelImageFromFileTest() {
@@ -124,7 +113,7 @@ public class PositiveImageTests extends BaseTest {
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/jpeg"))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -140,7 +129,7 @@ public class PositiveImageTests extends BaseTest {
         given()
                 .expect()
                 .when()
-                .get("/image/{Id}", imageHash2)
+                .get(Endpoints.getDeleteAndUpdateImage, imageHash2)
                 //.prettyPeek()
                 .then()
                 .log()
@@ -156,7 +145,7 @@ public class PositiveImageTests extends BaseTest {
                 .expect()
                 .body("data", is(true))
                 .when()
-                .post("/image/{imageHash}", imageHash)
+                .post(Endpoints.getDeleteAndUpdateImage, imageHash)
                 .then()
                 .log()
                 .status();
@@ -170,7 +159,7 @@ public class PositiveImageTests extends BaseTest {
                 .body("data.title", is(imageTitle))
                 .body("data.description", is(imageDescription))
                 .when()
-                .get("/image/{Id}", imageHash)
+                .get(Endpoints.getDeleteAndUpdateImage, imageHash)
                 .then()
                 .log()
                 .status();
@@ -183,7 +172,7 @@ public class PositiveImageTests extends BaseTest {
                 .expect()
                 .body("data", is("favorited"))
                 .when()
-                .post("/image/{imageHash2}/favorite", imageHash2)
+                .post(Endpoints.postFavoriteImage, imageHash2)
                 .then()
                 .log()
                 .status();
@@ -196,7 +185,7 @@ public class PositiveImageTests extends BaseTest {
                 .expect()
                 .body(containsString(imageHash2))
                 .when()
-                .get("/account/{username}/favorites", accountUrl)
+                .get(Endpoints.getAccountFavorites, accountUrl)
                 .then()
                 .log()
                 .status();
@@ -208,7 +197,7 @@ public class PositiveImageTests extends BaseTest {
         given()
                 .expect()
                 .when()
-                .delete("/image/{imageHash}", imageHash)
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash)
                 .prettyPeek()
                 .then()
                 .log()
@@ -221,12 +210,11 @@ public class PositiveImageTests extends BaseTest {
         RestAssured.responseSpecification = negative404ResponseSpec;
         given()
                 .when()
-                .get("/image/{imageHash}", imageHash)
+                .get(Endpoints.getDeleteAndUpdateImage, imageHash)
                 .then()
                 .log()
                 .status();
     }
-
 
     @AfterAll
     static void tearDown() {
@@ -234,39 +222,23 @@ public class PositiveImageTests extends BaseTest {
         given()
                 .expect()
                 .when()
-                .delete("/image/{imageHash}", imageHash2)
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash2)
                 .prettyPeek();
         given()
                 .expect()
                 .when()
-                .delete("/image/{imageHash}", imageHash3)
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash3)
                 .prettyPeek();
         given()
                 .expect()
                 .when()
-                .delete("/image/{imageHash}", imageHash4)
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash4)
                 .prettyPeek();
         given()
                 .expect()
                 .when()
-                .delete("/image/{imageHash}", imageHash5)
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash5)
                 .prettyPeek();
     }
-
-
-/*
-    private static byte[] getFileContentInBase64(String imageFileName) {
-        ClassLoader classLoader = PositiveImageTests.class.getClassLoader();
-        File inputFile = new File(Objects.requireNonNull(classLoader.getResource(imageFileName).getFile()));
-        byte[] fileContent = new byte[0];
-        try {
-            fileContent = FileUtils.readFileToByteArray(inputFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return fileContent;
-    }
-
- */
 
 }

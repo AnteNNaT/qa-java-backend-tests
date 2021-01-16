@@ -3,6 +3,9 @@ package ru.geekbrains;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.*;
 import ru.geekbrains.base.test.BaseTest;
+import ru.geekbrains.service.Endpoints;
+
+import javax.xml.ws.Endpoint;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -15,8 +18,8 @@ public class PositiveAlbumTests extends BaseTest {
     private static String albumHash;
 
     @BeforeAll
-    static void setUp()  {
-        RestAssured.responseSpecification=responseSpec;
+    static void setUp() {
+        RestAssured.responseSpecification = responseSpec;
     }
 
     @Test
@@ -28,7 +31,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/jpeg"))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -47,7 +50,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/jpeg"))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -70,7 +73,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data.id", is(notNullValue()))
                 .when()
-                .post("/album")
+                .post(Endpoints.postCreateAlbum)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -90,7 +93,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .body("data.images_count", is(1))
                 .body("data.account_url", is(accountUrl))
                 .when()
-                .get("/album/{albumHash}", albumHash)
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -104,7 +107,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .body("data.id", is(notNullValue()))
                 .body("data.type", is("image/jpeg"))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek()
                 .then()
                 .extract()
@@ -122,7 +125,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .body(containsString(imageHash2))
                 .body(containsString(imageHash))
                 .when()
-                .get("/album/{albumHash}", albumHash)
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
 
     }
@@ -134,7 +137,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data", is("favorited"))
                 .when()
-                .post("/album/{albumHash}/favorite", albumHash)
+                .post(Endpoints.postFavoriteAlbum, albumHash)
                 .prettyPeek();
 
     }
@@ -146,7 +149,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body(containsString(albumHash))
                 .when()
-                .get("/account/{username}/favorites", accountUrl)
+                .get(Endpoints.getAccountFavorites, accountUrl)
                 .prettyPeek();
     }
 
@@ -162,7 +165,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data", is(true))
                 .when()
-                .put("/album/{albumHash}", albumHash)
+                .put(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -178,7 +181,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .body(containsString(imageHash))
                 .body(not(containsString(imageHash2)))
                 .when()
-                .get("/album/{albumHash}", albumHash)
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -194,7 +197,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data", is(true))
                 .when()
-                .post("/album/{albumHash}", albumHash)
+                .post(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -210,7 +213,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .body(containsString(imageHash2))
                 .body(not(containsString(imageHash)))
                 .when()
-                .get("/album/{albumHash}", albumHash)
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -222,7 +225,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data", is(true))
                 .when()
-                .put("/album/{albumHash}/add", albumHash)
+                .put(Endpoints.putAddImageToAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -233,7 +236,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body(containsString(imageHash))
                 .when()
-                .get("/album/{albumHash}", albumHash)
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -245,7 +248,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data", is(true))
                 .when()
-                .delete("/album/{albumHash}/remove_images", albumHash)
+                .delete(Endpoints.deleteRemoveImageToAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -256,7 +259,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body(not(containsString(imageHash3)))
                 .when()
-                .get("/album/{albumHash}", albumHash)
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
     }
 
@@ -266,41 +269,40 @@ public class PositiveAlbumTests extends BaseTest {
         given()
                 .expect()
                 .when()
-                .delete("/album/{albumHash}", albumHash)
+                .delete(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .prettyPeek();
     }
 
     @Test
     @Order(18)
     void checkAlbumDeletionTest() {
-        RestAssured.responseSpecification=negative404ResponseSpec;
+        RestAssured.responseSpecification = negative404ResponseSpec;
         given()
                 .when()
-                .get("album/{albumHash}", albumHash)
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
                 .then()
                 .log()
                 .status();
     }
 
 
-
     @AfterAll
     static void tearDown() {
-        RestAssured.responseSpecification=responseSpec;
+        RestAssured.responseSpecification = responseSpec;
         given()
                 .expect()
                 .when()
-                .delete("/image/{imageHash}", imageHash)
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash)
                 .prettyPeek();
         given()
                 .expect()
                 .when()
-                .delete("/image/{imageHash}", imageHash2)
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash2)
                 .prettyPeek();
         given()
                 .expect()
                 .when()
-                .delete("/image/{imageHash}", imageHash3)
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash3)
                 .prettyPeek();
     }
 }

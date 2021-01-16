@@ -1,13 +1,10 @@
 package ru.geekbrains;
 
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.filter.log.LogDetail;
-import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.geekbrains.base.test.BaseTest;
+import ru.geekbrains.service.Endpoints;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -36,7 +33,7 @@ public class NegativeImageTests extends BaseTest {
                 .expect()
                 .body("data.error", is("File is over the size limit"))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek();
     }
 
@@ -48,7 +45,7 @@ public class NegativeImageTests extends BaseTest {
                 .body("data.error.type", is("ImgurException"))
                 .body("data.error.code", is(1003))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek();
     }
 
@@ -59,7 +56,7 @@ public class NegativeImageTests extends BaseTest {
                 .expect()
                 .body("data.error", is("Invalid URL (" + "?" + imageNatureUrl + ")"))
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek();
     }
 
@@ -77,7 +74,7 @@ public class NegativeImageTests extends BaseTest {
                 .multiPart("image", "")
                 .expect()
                 .when()
-                .post("/image")
+                .post(Endpoints.postCreateImage)
                 .prettyPeek();
     }
     /*
