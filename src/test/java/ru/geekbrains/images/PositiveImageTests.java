@@ -31,7 +31,6 @@ public class PositiveImageTests extends BaseTest {
     static void setUp() {
         encodedImage = getFileContentInBase64String(imageFileName);
         encodedSmallImage = getFileContentInBase64String(smallImageFile);
-        //RestAssured.requestSpecification = requestSpec;
         RestAssured.responseSpecification = responseSpec;
     }
 
@@ -40,7 +39,6 @@ public class PositiveImageTests extends BaseTest {
     void uploadPngImageFromFileTest() {
         ImageResponse imageResponse = given()
                 .spec(createRequestSpec(encodedImage))
-                // .multiPart("image", encodedImage)
                 .when()
                 .post(Endpoints.postCreateImage)
                 .then()
@@ -59,7 +57,6 @@ public class PositiveImageTests extends BaseTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode imageResponse = given()
                 .spec(createRequestSpec(imageNatureUrl))
-                //.multiPart("image", imageNatureUrl)
                 .when()
                 .post(Endpoints.postCreateImage)
                 .then()
@@ -79,7 +76,6 @@ public class PositiveImageTests extends BaseTest {
     void uploadNotAnimatedGifImageFromUrlTest() {
         ImageResponse imageResponse = given()
                 .spec(createRequestSpec(imageGifUrl))
-                //.multiPart("image", imageGifUrl)
                 .when()
                 .post(Endpoints.postCreateImage)
                 .then()
@@ -98,7 +94,6 @@ public class PositiveImageTests extends BaseTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode imageResponse = given()
                 .spec(createRequestSpec(imageAnimatedGifUrl))
-                //.multiPart("image", imageAnimatedGifUrl)
                 .when()
                 .post(Endpoints.postCreateImage)
                 .then()
@@ -121,7 +116,6 @@ public class PositiveImageTests extends BaseTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode imageResponse = given()
                 .spec(createRequestSpec(encodedSmallImage))
-                //.multiPart("image", encodedSmallImage)
                 .when()
                 .post(Endpoints.postCreateImage)
                 .then()
