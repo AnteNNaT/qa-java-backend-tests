@@ -1,4 +1,4 @@
-package ru.geekbrains;
+package ru.geekbrains.images;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,69 +13,65 @@ public class NegativeImageTests extends BaseTest {
 
 
     private static String encodedReallyNotImage;
+
     //private static RequestSpecification requestWithoutAuthSpec;
 
     @BeforeAll
     static void setUp() {
-        encodedReallyNotImage=getFileContentInBase64String(reallyNotImage);
-        RestAssured.responseSpecification=negativeResponseSpec;
+        encodedReallyNotImage = getFileContentInBase64String(reallyNotImage);
+        RestAssured.responseSpecification = negativeResponseSpec;
 
         //requestWithoutAuthSpec=new RequestSpecBuilder()
         //        .setAccept(ContentType.JSON)
         //        .log(LogDetail.ALL)
-       //         .build();
+        //         .build();
     }
 
     @Test
     void uploadTooLargeImageTest() {
         given()
-                .multiPart("image", largeImageUrl)
+                .spec(createRequestSpec(largeImageUrl))
                 .expect()
                 .body("data.error", is("File is over the size limit"))
                 .when()
-                .post(Endpoints.postCreateImage)
-                .prettyPeek();
+                .post(Endpoints.postCreateImage);
     }
 
     @Test
     void uploadTextFileInsteadOfImageTest() {
         given()
-                .multiPart("image", textFileUrl)
+                .spec(createRequestSpec(textFileUrl))
                 .expect()
                 .body("data.error.type", is("ImgurException"))
                 .body("data.error.code", is(1003))
                 .when()
-                .post(Endpoints.postCreateImage)
-                .prettyPeek();
+                .post(Endpoints.postCreateImage);
     }
 
     @Test
     void uploadImageWithInvalidUrlTest() {
         given()
-                .multiPart("image", "?" + imageNatureUrl)
+                .spec(createRequestSpec(invalidUrl))
                 .expect()
-                .body("data.error", is("Invalid URL (" + "?" + imageNatureUrl + ")"))
+                .body("data.error", is("Invalid URL (" + invalidUrl + ")"))
                 .when()
-                .post(Endpoints.postCreateImage)
-                .prettyPeek();
+                .post(Endpoints.postCreateImage);
     }
 
     @Test
     void uploadReallyNotImageFromFileTest() {
         given()
-                .multiPart("image", encodedReallyNotImage)
+                .spec(createRequestSpec(encodedReallyNotImage))
                 .when()
-                .post("/image")
-                .prettyPeek();
+                .post(Endpoints.postCreateImage);
     }
+
     @Test
     void uploadEmptyImageTest() {
         given()
-                .multiPart("image", "")
-                .expect()
+                .spec(createRequestSpec(""))
                 .when()
-                .post(Endpoints.postCreateImage)
-                .prettyPeek();
+                .post(Endpoints.postCreateImage);
     }
     /*
     @Test
@@ -85,9 +81,10 @@ public class NegativeImageTests extends BaseTest {
                 .multiPart("image",imageNatureUrl)
                 .expect()
                 .when()
-                .post("/image")
-                .prettyPeek();
+                .post("/image");
     }
 
      */
+
+
 }

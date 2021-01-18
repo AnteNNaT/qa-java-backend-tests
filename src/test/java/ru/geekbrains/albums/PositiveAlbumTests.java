@@ -1,14 +1,20 @@
-package ru.geekbrains;
+package ru.geekbrains.albums;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.*;
 import ru.geekbrains.base.test.BaseTest;
+import ru.geekbrains.dto.response.way2.AlbumInfoData;
+import ru.geekbrains.dto.response.way1.AlbumResponse;
+import ru.geekbrains.dto.response.way2.CommonResponse;
 import ru.geekbrains.service.Endpoints;
 
-import javax.xml.ws.Endpoint;
-
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PositiveAlbumTests extends BaseTest {
@@ -19,6 +25,7 @@ public class PositiveAlbumTests extends BaseTest {
 
     @BeforeAll
     static void setUp() {
+        RestAssured.requestSpecification = requestSpec;
         RestAssured.responseSpecification = responseSpec;
     }
 
@@ -32,7 +39,6 @@ public class PositiveAlbumTests extends BaseTest {
                 .body("data.type", is("image/jpeg"))
                 .when()
                 .post(Endpoints.postCreateImage)
-                .prettyPeek()
                 .then()
                 .extract()
                 .response()
@@ -51,7 +57,6 @@ public class PositiveAlbumTests extends BaseTest {
                 .body("data.type", is("image/jpeg"))
                 .when()
                 .post(Endpoints.postCreateImage)
-                .prettyPeek()
                 .then()
                 .extract()
                 .response()
@@ -67,14 +72,13 @@ public class PositiveAlbumTests extends BaseTest {
         albumHash = given()
                 .contentType("multipart/form-data")
                 .multiPart("ids[]", imageHash)
-                .multiPart("title", albumTitle)
-                .multiPart("description", albumDescription)
-                .multiPart("cover", imageHash)
+                .formParam("title", albumTitle)
+                .formParam("description", albumDescription)
+                .formParam("cover", imageHash)
                 .expect()
                 .body("data.id", is(notNullValue()))
                 .when()
                 .post(Endpoints.postCreateAlbum)
-                .prettyPeek()
                 .then()
                 .extract()
                 .response()
@@ -93,8 +97,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .body("data.images_count", is(1))
                 .body("data.account_url", is(accountUrl))
                 .when()
-                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash);
     }
 
     @Test
@@ -108,7 +111,6 @@ public class PositiveAlbumTests extends BaseTest {
                 .body("data.type", is("image/jpeg"))
                 .when()
                 .post(Endpoints.postCreateImage)
-                .prettyPeek()
                 .then()
                 .extract()
                 .response()
@@ -119,15 +121,21 @@ public class PositiveAlbumTests extends BaseTest {
     @Test
     @Order(6)
     void getImageInAlbumTest() {
-        given()
-                .expect()
-                .body("data.images_count", is(2))
-                .body(containsString(imageHash2))
-                .body(containsString(imageHash))
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode imageResponse = given()
                 .when()
                 .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
-
+                .then()
+                .extract()
+                .response()
+                .as(JsonNode.class);
+        CommonResponse<AlbumInfoData> albumInfoData =
+                mapper.convertValue(imageResponse, new TypeReference<CommonResponse<AlbumInfoData>>() {
+                });
+        assertThat(albumInfoData.getData().getImageInfoResponse(), containsInAnyOrder
+                (hasProperty("id", is(imageHash2)),
+                        hasProperty("id", is(imageHash))));
+        assertThat(albumInfoData.getData().getImagesCount(), is(2));
     }
 
     @Test
@@ -137,8 +145,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data", is("favorited"))
                 .when()
-                .post(Endpoints.postFavoriteAlbum, albumHash)
-                .prettyPeek();
+                .post(Endpoints.postFavoriteAlbum, albumHash);
 
     }
 
@@ -149,8 +156,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body(containsString(albumHash))
                 .when()
-                .get(Endpoints.getAccountFavorites, accountUrl)
-                .prettyPeek();
+                .get(Endpoints.getAccountFavorites, accountUrl);
     }
 
     @Test
@@ -159,19 +165,19 @@ public class PositiveAlbumTests extends BaseTest {
         given()
                 .multiPart("ids[]", imageHash)
                 .multiPart("ids[]", imageHash3)
-                .multiPart("title", updatedAlbumTitle)
-                .multiPart("description", updatedAlbumDescription)
-                .multiPart("cover", imageHash3)
+                .formParam("title", updatedAlbumTitle)
+                .formParam("description", updatedAlbumDescription)
+                .formParam("cover", imageHash3)
                 .expect()
                 .body("data", is(true))
                 .when()
-                .put(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
+                .put(Endpoints.getDeleteAndUpdateAlbum, albumHash);
     }
 
     @Test
     @Order(10)
     void checkUpdateAlbumUsingPutTest() {
+        //AlbumResponseData album=
         given()
                 .expect()
                 .body("data.title", is(updatedAlbumTitle))
@@ -181,40 +187,52 @@ public class PositiveAlbumTests extends BaseTest {
                 .body(containsString(imageHash))
                 .body(not(containsString(imageHash2)))
                 .when()
-                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash);
+        //   .then()
+        //   .extract()
+        //  .response()
+        // .as(AlbumResponseData.class);
+        //assertThat(album.getData().getTitle(), is(updatedAlbumTitle));
+        // System.out.println(album.getData().getId());
     }
 
     @Test
     @Order(11)
     void updateAlbumUsingPostTest() {
+        updatedAlbumTitle = faker.hobbit().location();
+        updatedAlbumDescription = faker.hobbit().thorinsCompany();
         given()
                 .multiPart("ids[]", imageHash2)
                 .multiPart("ids[]", imageHash3)
-                .multiPart("title", updatedAlbumTitle + "1")
-                .multiPart("description", updatedAlbumDescription + "1")
-                .multiPart("cover", imageHash2)
+                .formParam("title", updatedAlbumTitle)
+                .formParam("description", updatedAlbumDescription)
+                .formParam("cover", imageHash2)
                 .expect()
                 .body("data", is(true))
                 .when()
-                .post(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
+                .post(Endpoints.getDeleteAndUpdateAlbum, albumHash);
     }
 
     @Test
     @Order(12)
     void checkUpdateAlbumUsingPostTest() {
-        given()
-                .expect()
-                .body("data.title", is(updatedAlbumTitle + "1"))
-                .body("data.description", is(updatedAlbumDescription + "1"))
-                .body("data.cover", is(imageHash2))
-                .body(containsString(imageHash3))
-                .body(containsString(imageHash2))
-                .body(not(containsString(imageHash)))
-                .when()
-                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
+        AlbumResponse album =
+                given()
+                        // .expect()
+                        .when()
+                        .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
+                        .then()
+                        .extract()
+                        .response()
+                        .as(AlbumResponse.class);
+        assertThat(album.getData().getCover(), is(imageHash2));
+        assertThat(album.getData().getTitle(), is(updatedAlbumTitle));
+        assertThat(album.getData().getDescription(), is(updatedAlbumDescription));
+        assertThat(album.getData().getImages(), containsInAnyOrder(
+                hasProperty("id", is(imageHash2)),
+                hasProperty("id", is(imageHash3))
+        ));
+        assertThat(album.getData().getImages(), not(contains(hasProperty("id", is(imageHash2)))));
     }
 
     @Test
@@ -225,8 +243,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data", is(true))
                 .when()
-                .put(Endpoints.putAddImageToAlbum, albumHash)
-                .prettyPeek();
+                .put(Endpoints.putAddImageToAlbum, albumHash);
     }
 
     @Test
@@ -236,8 +253,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body(containsString(imageHash))
                 .when()
-                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash);
     }
 
     @Test
@@ -248,8 +264,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body("data", is(true))
                 .when()
-                .delete(Endpoints.deleteRemoveImageToAlbum, albumHash)
-                .prettyPeek();
+                .delete(Endpoints.deleteRemoveImageToAlbum, albumHash);
     }
 
     @Test
@@ -259,8 +274,7 @@ public class PositiveAlbumTests extends BaseTest {
                 .expect()
                 .body(not(containsString(imageHash3)))
                 .when()
-                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash);
     }
 
     @Test
@@ -269,8 +283,7 @@ public class PositiveAlbumTests extends BaseTest {
         given()
                 .expect()
                 .when()
-                .delete(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .prettyPeek();
+                .delete(Endpoints.getDeleteAndUpdateAlbum, albumHash);
     }
 
     @Test
@@ -279,10 +292,7 @@ public class PositiveAlbumTests extends BaseTest {
         RestAssured.responseSpecification = negative404ResponseSpec;
         given()
                 .when()
-                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash)
-                .then()
-                .log()
-                .status();
+                .get(Endpoints.getDeleteAndUpdateAlbum, albumHash);
     }
 
 
@@ -292,17 +302,14 @@ public class PositiveAlbumTests extends BaseTest {
         given()
                 .expect()
                 .when()
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash)
-                .prettyPeek();
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash);
         given()
                 .expect()
                 .when()
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash2)
-                .prettyPeek();
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash2);
         given()
                 .expect()
                 .when()
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash3)
-                .prettyPeek();
+                .delete(Endpoints.getDeleteAndUpdateImage, imageHash3);
     }
 }

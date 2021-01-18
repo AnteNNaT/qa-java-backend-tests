@@ -1,4 +1,4 @@
-package ru.geekbrains.dto.response;
+package ru.geekbrains.dto.response.way2;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,13 +11,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "success",
         "status"
 })
-public class AlbumInfoResponse {
+public class CommonResponse<T> {
 
     @JsonProperty("data")
-    public AlbumInfoData albumInfoData;
+    private T data;
     @JsonProperty("success")
-    public Boolean success;
+    private Boolean success;
     @JsonProperty("status")
-    public Integer status;
+    private Integer status;
 
 }

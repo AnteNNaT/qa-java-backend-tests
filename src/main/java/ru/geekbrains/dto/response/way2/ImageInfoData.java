@@ -1,4 +1,4 @@
-package ru.geekbrains.dto.response;
+package ru.geekbrains.dto.response.way2;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -6,63 +6,61 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @lombok.Data
-public class ImageInfoResponse {
-
+public class ImageInfoData {
     @JsonProperty("id")
-    public String id;
+    private String id;
     @JsonProperty("title")
-    public Object title;
+    private Object title;
     @JsonProperty("description")
-    public Object description;
+    private Object description;
     @JsonProperty("datetime")
-    public Integer datetime;
+    private Integer datetime;
     @JsonProperty("type")
-    public String type;
+    private String type;
     @JsonProperty("animated")
-    public Boolean animated;
+    private Boolean animated;
     @JsonProperty("width")
-    public Integer width;
+    private Integer width;
     @JsonProperty("height")
-    public Integer height;
+    private Integer height;
     @JsonProperty("size")
-    public Integer size;
+    private Integer size;
     @JsonProperty("views")
-    public Integer views;
+    private Integer views;
     @JsonProperty("bandwidth")
-    public Integer bandwidth;
+    private Integer bandwidth;
     @JsonProperty("vote")
-    public Object vote;
+    private Object vote;
     @JsonProperty("favorite")
-    public Boolean favorite;
+    private Boolean favorite;
     @JsonProperty("nsfw")
-    public Object nsfw;
+    private Object nsfw;
     @JsonProperty("section")
-    public Object section;
+    private Object section;
     @JsonProperty("account_url")
-    public Object accountUrl;
+    private Object accountUrl;
     @JsonProperty("account_id")
-    public Object accountId;
+    private Object accountId;
     @JsonProperty("is_ad")
-    public Boolean isAd;
+    private Boolean isAd;
     @JsonProperty("in_most_viral")
-    public Boolean inMostViral;
+    private Boolean inMostViral;
     @JsonProperty("has_sound")
-    public Boolean hasSound;
+    private Boolean hasSound;
     @JsonProperty("tags")
-    public List<Object> tags = null;
+    private List<Object> tags = null;
     @JsonProperty("ad_type")
-    public Integer adType;
+    private Integer adType;
     @JsonProperty("ad_url")
-    public String adUrl;
+    private String adUrl;
     @JsonProperty("edited")
-    public String edited;
+    private String edited;
     @JsonProperty("in_gallery")
-    public Boolean inGallery;
+    private Boolean inGallery;
     @JsonProperty("deletehash")
-    public String deletehash;
+    private String deletehash;
     @JsonProperty("name")
-    public Object name;
+    private Object name;
     @JsonProperty("link")
-    public String link;
-
+    private String link;
 }

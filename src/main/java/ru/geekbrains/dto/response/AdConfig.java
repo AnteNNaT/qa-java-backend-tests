@@ -9,14 +9,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AdConfig {
 
     @JsonProperty("safeFlags")
-    public List<String> safeFlags = null;
+    private List<String> safeFlags = null;
     @JsonProperty("highRiskFlags")
-    public List<Object> highRiskFlags = null;
+    private List<Object> highRiskFlags = null;
     @JsonProperty("unsafeFlags")
-    public List<String> unsafeFlags = null;
+    private List<String> unsafeFlags = null;
     @JsonProperty("wallUnsafeFlags")
-    public List<Object> wallUnsafeFlags = null;
+    private List<Object> wallUnsafeFlags = null;
     @JsonProperty("showsAds")
-    public Boolean showsAds;
+    private Boolean showsAds;
 
 }

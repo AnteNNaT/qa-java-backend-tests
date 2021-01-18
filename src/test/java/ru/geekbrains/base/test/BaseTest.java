@@ -1,10 +1,15 @@
 package ru.geekbrains.base.test;
 
+import com.github.javafaker.Faker;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
+import io.restassured.builder.MultiPartSpecBuilder;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
-import io.restassured.filter.log.LogDetail;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+import io.restassured.specification.MultiPartSpecification;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.apache.commons.io.FileUtils;
@@ -32,41 +37,44 @@ public abstract class BaseTest {
     protected static Map<String, String> headers = new HashMap<>();
     protected static String token;
     protected static String imageNatureUrl;
+    protected static String largeImageUrl;
+    protected static String textFileUrl;
+    protected static String imageGifUrl;
+    protected static String imageAnimatedGifUrl;
+    protected static String invalidUrl;
     protected static String albumTitle;
     protected static String albumDescription;
     protected static String accountUrl;
     protected static String imageTitle;
     protected static String imageDescription;
-    protected static String imageGifUrl;
-    protected static String imageAnimatedGifUrl;
     protected static String updatedAlbumTitle;
     protected static String updatedAlbumDescription;
-    protected static String largeImageUrl;
-    protected static String textFileUrl;
     protected static ResponseSpecification responseSpec;
     protected static ResponseSpecification negativeResponseSpec;
     protected static ResponseSpecification negative404ResponseSpec;
     protected static RequestSpecification requestSpec;
-
+    protected static Faker faker = new Faker();
 
     @BeforeAll
     static void beforeAll() {
         loadProperties();
         token = prop.getProperty("token");
-        albumTitle = prop.getProperty("albumTitle");
-        albumDescription = prop.getProperty("albumDescription");
         accountUrl = prop.getProperty("accountUrl");
-        imageTitle = prop.getProperty("imageTitle");
-        imageDescription = prop.getProperty("imageDescription");
+        imageTitle = faker.dune().planet();
+        imageDescription = faker.dune().quote();
         imageNatureUrl = prop.getProperty("imageNatureUrl");
         imageGifUrl = prop.getProperty("imageGifUrl");
-        imageAnimatedGifUrl = prop.getProperty("imageAnimatedGifUrl");
-        updatedAlbumTitle = prop.getProperty("updatedAlbumTitle");
-        updatedAlbumDescription = prop.getProperty("updatedAlbumDescription");
         largeImageUrl = prop.getProperty("largeImageUrl");
         textFileUrl = prop.getProperty("textFileUrl");
+        imageAnimatedGifUrl = prop.getProperty("imageAnimatedGifUrl");
+        invalidUrl = "?" + imageNatureUrl;
+        albumTitle = faker.book().title();
+        albumDescription = faker.elderScrolls().quote();
+        updatedAlbumTitle = faker.hobbit().character();
+        updatedAlbumDescription = faker.hobbit().quote();
         headers.put("Authorization", token);
         RestAssured.baseURI = prop.getProperty("base.url");
+        RestAssured.filters(new ResponseLoggingFilter(), new RequestLoggingFilter(), new AllureRestAssured());
 
         responseSpec = new ResponseSpecBuilder()
                 .expectStatusCode(200)
@@ -90,10 +98,8 @@ public abstract class BaseTest {
         requestSpec = new RequestSpecBuilder()
                 .addHeaders(headers)
                 .setAccept(ContentType.JSON)
-                .log(LogDetail.ALL)
                 .build();
 
-        RestAssured.requestSpecification = requestSpec;
     }
 
     protected static String getFileContentInBase64String(File fileName) {
@@ -104,6 +110,17 @@ public abstract class BaseTest {
             e.printStackTrace();
         }
         return Base64.getEncoder().encodeToString(fileContent);
+    }
+
+    protected static RequestSpecification createRequestSpec(String value) {
+        RequestSpecification requestSpecWithMultiPart;
+        MultiPartSpecification multiPartSpec;
+        multiPartSpec = new MultiPartSpecBuilder(value)
+                .controlName("image")
+                .build();
+        requestSpecWithMultiPart = requestSpec
+                .multiPart(multiPartSpec);
+        return requestSpecWithMultiPart;
     }
 
     private static void loadProperties() {
