@@ -118,8 +118,11 @@ public abstract class BaseTest {
         multiPartSpec = new MultiPartSpecBuilder(value)
                 .controlName("image")
                 .build();
-        requestSpecWithMultiPart = requestSpec
-                .multiPart(multiPartSpec);
+        requestSpecWithMultiPart = new RequestSpecBuilder()
+                        .addHeaders(headers)
+                        .setAccept(ContentType.JSON)
+                        .build()
+                        .multiPart(multiPartSpec);
         return requestSpecWithMultiPart;
     }
 

@@ -11,6 +11,7 @@ import ru.geekbrains.dto.response.way2.CommonResponse;
 import ru.geekbrains.dto.response.way2.ImageInfoData;
 import ru.geekbrains.dto.response.way1.ImageResponse;
 import ru.geekbrains.service.Endpoints;
+import ru.geekbrains.utils.StepUtils;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -207,23 +208,12 @@ public class PositiveImageTests extends BaseTest {
 
     @AfterAll
     static void tearDown() {
+        RestAssured.requestSpecification = requestSpec;
         RestAssured.responseSpecification = responseSpec;
-        given()
-                .spec(requestSpec)
-                .when()
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash2);
-        given()
-                .when()
-                .spec(requestSpec)
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash3);
-        given()
-                .when()
-                .spec(requestSpec)
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash4);
-        given()
-                .when()
-                .spec(requestSpec)
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash5);
+        StepUtils.deleteImagesAfterTests(imageHash2);
+        StepUtils.deleteImagesAfterTests(imageHash3);
+        StepUtils.deleteImagesAfterTests(imageHash4);
+        StepUtils.deleteImagesAfterTests(imageHash5);
     }
 
 }

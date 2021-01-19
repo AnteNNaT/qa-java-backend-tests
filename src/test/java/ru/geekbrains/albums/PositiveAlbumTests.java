@@ -10,6 +10,7 @@ import ru.geekbrains.dto.response.way2.AlbumInfoData;
 import ru.geekbrains.dto.response.way1.AlbumResponse;
 import ru.geekbrains.dto.response.way2.CommonResponse;
 import ru.geekbrains.service.Endpoints;
+import ru.geekbrains.utils.StepUtils;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -177,7 +178,6 @@ public class PositiveAlbumTests extends BaseTest {
     @Test
     @Order(10)
     void checkUpdateAlbumUsingPutTest() {
-        //AlbumResponseData album=
         given()
                 .expect()
                 .body("data.title", is(updatedAlbumTitle))
@@ -188,12 +188,6 @@ public class PositiveAlbumTests extends BaseTest {
                 .body(not(containsString(imageHash2)))
                 .when()
                 .get(Endpoints.getDeleteAndUpdateAlbum, albumHash);
-        //   .then()
-        //   .extract()
-        //  .response()
-        // .as(AlbumResponseData.class);
-        //assertThat(album.getData().getTitle(), is(updatedAlbumTitle));
-        // System.out.println(album.getData().getId());
     }
 
     @Test
@@ -299,17 +293,8 @@ public class PositiveAlbumTests extends BaseTest {
     @AfterAll
     static void tearDown() {
         RestAssured.responseSpecification = responseSpec;
-        given()
-                .expect()
-                .when()
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash);
-        given()
-                .expect()
-                .when()
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash2);
-        given()
-                .expect()
-                .when()
-                .delete(Endpoints.getDeleteAndUpdateImage, imageHash3);
+        StepUtils.deleteImagesAfterTests(imageHash);
+        StepUtils.deleteImagesAfterTests(imageHash2);
+        StepUtils.deleteImagesAfterTests(imageHash3);
     }
 }
