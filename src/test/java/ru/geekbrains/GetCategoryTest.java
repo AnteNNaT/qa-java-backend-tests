@@ -51,10 +51,10 @@ public class GetCategoryTest {
     /*
     разобраться с NullPointerException
      */
-    void getCategoryWithNonexistentIdNegativeTest() {
+    void getCategoryByNonExistentIdNegativeTest() {
         Response<GetCategoryResponse> response = categoryService.getCategory(NULL_CATEGORY.id).execute();
         assertThat(response.code(), equalTo(404));
-        System.out.println(response.errorBody().string());
+       // System.out.println(response.errorBody().string());
        //String s=response.errorBody().string();
        // ObjectMapper mapper = new ObjectMapper();
        // JsonNode actualObj = mapper.readTree(s);

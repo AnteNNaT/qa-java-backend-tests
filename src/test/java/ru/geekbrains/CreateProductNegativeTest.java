@@ -4,18 +4,18 @@ import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
 import ru.geekbrains.dto.Product;
+import ru.geekbrains.dto.ProductWithDoublePrice;
 import ru.geekbrains.enums.Category;
 import ru.geekbrains.service.ProductService;
 import ru.geekbrains.utils.RetrofitUtils;
 
-import java.util.Locale;
-
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class CreateProductNegativeTest {
     private static ProductService productService;
@@ -26,6 +26,7 @@ public class CreateProductNegativeTest {
     private static Product product5;
     private static Product product6;
     private static Product product7;
+    private static ProductWithDoublePrice product8;
     private static int id;
     private static Faker faker = new Faker();
 
@@ -34,23 +35,23 @@ public class CreateProductNegativeTest {
     static void beforeAll() {
         productService = RetrofitUtils.getRetrofit()
                 .create(ProductService.class);
-        product1=new Product()
+        product1 = new Product()
                 .withTitle(faker.food().ingredient())
                 .withCategoryTitle(Category.NULL_CATEGORY.title)
                 .withPrice((int) (Math.random() * 10000));
-        product2=new Product()
+        product2 = new Product()
                 .withTitle(faker.food().ingredient())
                 .withCategoryTitle(String.valueOf(Category.FOOD.id))
                 .withPrice((int) (Math.random() * 10000));
-        product3=new Product()
+        product3 = new Product()
                 .withId(1000)
                 .withTitle(faker.food().ingredient())
                 .withCategoryTitle(Category.FOOD.title)
                 .withPrice((int) (Math.random() * 10000));
-        product5=new Product()
+        product5 = new Product()
                 .withTitle(faker.food().ingredient())
                 .withPrice((int) (Math.random() * 10000));
-        product6=new Product()
+        product6 = new Product()
                 .withTitle(faker.lorem().fixedString(500))
                 .withCategoryTitle(Category.FOOD.title)
                 .withPrice((int) (Math.random() * 10000));
@@ -58,6 +59,10 @@ public class CreateProductNegativeTest {
                 .withTitle(faker.food().ingredient())
                 .withCategoryTitle(Category.FOOD.title)
                 .withPrice((int) -(Math.random() * 10000));
+        product8 = new ProductWithDoublePrice()
+                .withTitle(faker.food().ingredient())
+                .withCategoryTitle(Category.FOOD.title)
+                .withPrice(3000000000.0);
     }
 
     @Test
@@ -67,6 +72,7 @@ public class CreateProductNegativeTest {
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
     }
+
     @Test
     @SneakyThrows
     void createProductWithIdCategoryTest() {
@@ -74,6 +80,7 @@ public class CreateProductNegativeTest {
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
     }
+
     @Test
     @SneakyThrows
     void createProductWithIdProductTest() {
@@ -89,6 +96,7 @@ public class CreateProductNegativeTest {
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
     }
+
     @Test
     @SneakyThrows
     void createProductWithTooLongTitleTest() {
@@ -96,6 +104,7 @@ public class CreateProductNegativeTest {
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
     }
+
     @Test
     @SneakyThrows
         //move to negativeTest?
@@ -103,13 +112,26 @@ public class CreateProductNegativeTest {
         Response<Product> response = productService.createProduct(product7)
                 .execute();
         id = response.body().getId();
-        assertThat(response.isSuccessful(), CoreMatchers.is(true));
+        assertThat(response.isSuccessful(), CoreMatchers.is(false));
+    }
+
+    @Test
+    @SneakyThrows
+    void createProductWithTooLongPriceTest() {
+        Response<ProductWithDoublePrice> response = productService.createProductWithDoublePrice(product8)
+                .execute();
+        assertThat(response.isSuccessful(), CoreMatchers.is(false));
+        assertThat(response.code(), is(400));
     }
 
     @SneakyThrows
-    @AfterAll
-    static void afterAll() {
+    @AfterEach
+    void tearDown() {
+        if (id!=0) {
             Response<ResponseBody> response = productService.deleteProduct(id).execute();
             assertThat(response.isSuccessful(), CoreMatchers.is(true));
-    }
+            id=0;
+        }
+        }
+
 }
