@@ -2,19 +2,23 @@ package ru.geekbrains;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
+import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
+import ru.geekbrains.dto.ErrorResponse;
 import ru.geekbrains.dto.Product;
 import ru.geekbrains.dto.ProductWithDoublePrice;
 import ru.geekbrains.enums.Category;
+import ru.geekbrains.service.Messages;
 import ru.geekbrains.service.ProductService;
 import ru.geekbrains.utils.RetrofitUtils;
 import ru.geekbrains.utils.StepUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 public class CreateProductNegativeTest {
@@ -71,6 +75,7 @@ public class CreateProductNegativeTest {
         Response<Product> response = productService.createProduct(product1)
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
+        assertThat(response.code(),is(500));
     }
 
     @Test
@@ -79,13 +84,17 @@ public class CreateProductNegativeTest {
         Response<Product> response = productService.createProduct(product2)
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
+
     }
 
     @Test
     @SneakyThrows
     void createProductWithIdProductTest() {
-        Response<Product> response = productService.createProduct(product3)
+        Response<ResponseBody> response = productService.createProductWithError(product3)
                 .execute();
+        ErrorResponse errorResponse = StepUtils.convertToErrorResponse(response.errorBody().string());
+        assertThat(errorResponse.getStatus(), equalTo(response.code()));
+        assertThat(errorResponse.getMessage(), equalTo(Messages.idMustBeNull));
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
     }
 

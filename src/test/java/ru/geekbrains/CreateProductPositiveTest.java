@@ -2,7 +2,6 @@ package ru.geekbrains;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
-import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;

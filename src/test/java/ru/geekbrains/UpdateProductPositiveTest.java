@@ -2,15 +2,12 @@ package ru.geekbrains;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
-import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
 import ru.geekbrains.dto.Product;
-import ru.geekbrains.dto.ProductWithDoublePrice;
 import ru.geekbrains.enums.Category;
 import ru.geekbrains.service.ProductService;
 import ru.geekbrains.utils.RetrofitUtils;
@@ -74,6 +71,7 @@ public class UpdateProductPositiveTest {
         updateTitleInProductTest();
         updatePriceInProductTest();
         updateCategoryInProductTest();
+        updateTitleInRusInProductTest();
     }
 
     @Test
@@ -158,7 +156,6 @@ public class UpdateProductPositiveTest {
     }
 
     @SneakyThrows
-    @Test
     void updateTitleInRusInProductTest() {
         product1.setTitle(fakerRu.name().fullName());
         Response<Product> response = productService.updateProduct(product1)

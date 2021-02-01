@@ -13,6 +13,9 @@ public interface ProductService {
     Call<Product> createProduct(@Body Product createProductRequest);
 
     @POST("products")
+    Call<ResponseBody> createProductWithError(@Body Product createProductRequest);
+
+    @POST("products")
     Call<ProductWithDoublePrice> createProductWithDoublePrice(@Body ProductWithDoublePrice createProductRequest);
 
     @DELETE("products/{id}")

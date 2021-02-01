@@ -4,7 +4,6 @@ import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
@@ -15,7 +14,6 @@ import ru.geekbrains.dto.Product;
 import ru.geekbrains.enums.Category;
 import ru.geekbrains.service.ProductService;
 import ru.geekbrains.utils.RetrofitUtils;
-import ru.geekbrains.utils.StepUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -84,11 +82,6 @@ public class GetProductTest {
         Response<Product> response = productService.getProduct(id).execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
     }
-
-    @SneakyThrows
-    @AfterAll
-    static void afterAll() {
-        assertThat(StepUtils.deleteImagesAfterTests(id).isSuccessful(), CoreMatchers.is(true));
-    }
-
 }
+
+

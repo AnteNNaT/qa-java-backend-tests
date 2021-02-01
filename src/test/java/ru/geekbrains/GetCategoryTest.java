@@ -1,14 +1,9 @@
 package ru.geekbrains;
 
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,7 +18,6 @@ import ru.geekbrains.service.ProductService;
 import ru.geekbrains.utils.RetrofitUtils;
 import ru.geekbrains.utils.StepUtils;
 
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -72,10 +66,7 @@ public class GetCategoryTest {
     void getCategoryByNonExistentIdNegativeTest() {
         Response<ResponseBody> response = categoryService.getErrorNotFound(NULL_CATEGORY.id).execute();
         assertThat(response.code(), equalTo(404));
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualObj = mapper.readTree(response.errorBody().string());
-        ErrorResponse errorResponse = mapper.convertValue(actualObj, new TypeReference<ErrorResponse>() {
-        });
+        ErrorResponse errorResponse = StepUtils.convertToErrorResponse(response.errorBody().string());
         assertThat(errorResponse.getStatus(), equalTo(404));
         assertThat(errorResponse.getMessage(), equalTo(Messages.unableToFindCategory + NULL_CATEGORY.id));
     }
