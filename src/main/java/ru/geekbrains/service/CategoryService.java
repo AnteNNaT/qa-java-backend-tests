@@ -1,5 +1,6 @@
 package ru.geekbrains.service;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -12,5 +13,5 @@ public interface CategoryService {
     Call<GetCategoryResponse> getCategory(@Path("id") int id);
 
     @GET("categories/{id}")
-    Call<ErrorResponse> getErrorNotFound(@Path("id") int id);
+    Call<ResponseBody> getErrorNotFound(@Path("id") int id);
 }

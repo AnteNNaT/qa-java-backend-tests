@@ -13,6 +13,7 @@ import ru.geekbrains.enums.Category;
 import ru.geekbrains.dto.Product;
 import ru.geekbrains.service.ProductService;
 import ru.geekbrains.utils.RetrofitUtils;
+import ru.geekbrains.utils.StepUtils;
 
 import java.util.Locale;
 
@@ -42,23 +43,23 @@ public class CreateProductPositiveTest {
         product1 = new Product()
                 .withTitle(faker.food().ingredient())
                 .withCategoryTitle(Category.FOOD.title)
-                .withPrice((int)(Math.random() * 10000));
-        product2=new Product()
+                .withPrice((int) (Math.random() * 10000));
+        product2 = new Product()
                 .withTitle(fakerRu.name().fullName())
                 .withCategoryTitle(Category.FOOD.title)
-                .withPrice((int)(Math.random() * 10000));
-        product3=new Product()
+                .withPrice((int) (Math.random() * 10000));
+        product3 = new Product()
                 .withTitle(" ")
                 .withCategoryTitle(Category.FOOD.title)
-                .withPrice((int)(Math.random() * 10000));
-        product4=new Product()
+                .withPrice((int) (Math.random() * 10000));
+        product4 = new Product()
                 .withCategoryTitle(Category.FOOD.title)
-                .withPrice((int)(Math.random() * 10000));
-        product5=new Product()
+                .withPrice((int) (Math.random() * 10000));
+        product5 = new Product()
                 .withTitle("$%@")
                 .withCategoryTitle(Category.FOOD.title)
-                .withPrice((int)(Math.random() * 10000));
-        product6=new Product()
+                .withPrice((int) (Math.random() * 10000));
+        product6 = new Product()
                 .withTitle(faker.food().ingredient())
                 .withCategoryTitle(Category.FOOD.title);
         product7 = new Product()
@@ -92,6 +93,7 @@ public class CreateProductPositiveTest {
         assertThat(response.isSuccessful(), CoreMatchers.is(true));
         assertThat(response.body().getTitle(), equalTo(product2.getTitle()));
     }
+
     @Test
     @SneakyThrows
     void createProductWithSpacesInTitleTest() {
@@ -101,6 +103,7 @@ public class CreateProductPositiveTest {
         assertThat(response.isSuccessful(), CoreMatchers.is(true));
         assertThat(response.body().getTitle(), equalTo(product3.getTitle()));
     }
+
     @Test
     @SneakyThrows
     void createProductWithEmptyNameTest() {
@@ -110,6 +113,7 @@ public class CreateProductPositiveTest {
         assertThat(response.isSuccessful(), is(true));
         assertThat(response.body().getTitle(), is(nullValue()));
     }
+
     @Test
     @SneakyThrows
     void createProductWithSpecialSymbolsInTitleTest() {
@@ -119,6 +123,7 @@ public class CreateProductPositiveTest {
         assertThat(response.isSuccessful(), is(true));
         assertThat(response.body().getTitle(), equalTo(product5.getTitle()));
     }
+
     @Test
     @SneakyThrows
     void createProductWithEmptyPriceTest() {
@@ -128,6 +133,7 @@ public class CreateProductPositiveTest {
         assertThat(response.isSuccessful(), is(true));
         assertThat(response.body().getPrice(), equalTo(0));
     }
+
     @Test
     @SneakyThrows
     void createProductWithNullPriceTest() {
@@ -145,8 +151,9 @@ public class CreateProductPositiveTest {
                 .execute();
         id = response.body().getId();
         assertThat(response.isSuccessful(), CoreMatchers.is(true));
-        assertThat((int)response.body().getPrice(), equalTo((int)product9.getPrice()));
+        assertThat((int) response.body().getPrice(), equalTo((int) product9.getPrice()));
     }
+
     @Test
     @SneakyThrows
     void createProductsWithEqualsParametersTest() {
@@ -156,7 +163,7 @@ public class CreateProductPositiveTest {
         assertThat(response.isSuccessful(), CoreMatchers.is(true));
         Response<Product> response2 = productService.createProduct(product1)
                 .execute();
-        id2=response2.body().getId();
+        id2 = response2.body().getId();
         assertThat(response.isSuccessful(), CoreMatchers.is(true));
     }
 
@@ -164,10 +171,10 @@ public class CreateProductPositiveTest {
     @SneakyThrows
     @AfterEach
     void tearDown() {
-        Response<ResponseBody> response = productService.deleteProduct(id).execute();
-        assertThat(response.isSuccessful(), CoreMatchers.is(true));
-        if (id2!=0){Response<ResponseBody> response2 = productService.deleteProduct(id2).execute();
-            assertThat(response2.isSuccessful(), CoreMatchers.is(true));}
+        assertThat(StepUtils.deleteImagesAfterTests(id).isSuccessful(), CoreMatchers.is(true));
+        if (id2 != 0) {
+            assertThat(StepUtils.deleteImagesAfterTests(id2).isSuccessful(), CoreMatchers.is(true));
+        }
     }
 
 }
@@ -176,8 +183,7 @@ public class CreateProductPositiveTest {
 Category
 1) получить категорию +
 2) получить категорию с несуществующим id+
-3) получить категорию с пустым id
-4) получить категорию после создания новых товаров
+4) получить категорию после создания новых товаров+
 Product
 позитивные тесты
 POST
@@ -188,10 +194,11 @@ GET
 GET (products)
 получить все продукты
 PUT
-1) обновить цену
+1) обновить цену+
 2) обновить наименование+
-3) обновить категорию
-4) обновить все сразу
+3) обновить категорию+
+4) обновить все сразу+
+
 
 негативные тесты
 POST
@@ -214,21 +221,18 @@ GET
 18) получить продукт с пустым id+
 19) получить удаленный продукт+
 PUT
-19) несуществующий id
-20) несуществующая категория
-12) пустая категория
-21) с пустым наименованием
-22) с длинным наименованием
-23) непечатные символы в наименовании
-24) пробелы в наименовании
-25) с повторяющимся наименованием, ценой
-26) дробное число в цене
-27) с отрицательной ценой
-28) с пустой ценой
-29) с нулевой ценой
+19) несуществующий id+
+20) несуществующая категория+
+12) null категория+
+21) с null наименованием+
+22) с длинным наименованием+
+27) с отрицательной ценой+
+29) с нулевой ценой+
+30) id не указано+
+31) с русским наименованием+
 
 DELETE
-1) удалить с несуществующим id
-2) удалить с пустым id
+1) удалить с несуществующим id+
+2) удалить с пустым id+
 
  */

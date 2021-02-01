@@ -2,7 +2,6 @@ package ru.geekbrains;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
-import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +12,7 @@ import ru.geekbrains.dto.ProductWithDoublePrice;
 import ru.geekbrains.enums.Category;
 import ru.geekbrains.service.ProductService;
 import ru.geekbrains.utils.RetrofitUtils;
+import ru.geekbrains.utils.StepUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -107,7 +107,6 @@ public class CreateProductNegativeTest {
 
     @Test
     @SneakyThrows
-        //move to negativeTest?
     void createProductWithNegativePriceTest() {
         Response<Product> response = productService.createProduct(product7)
                 .execute();
@@ -127,11 +126,10 @@ public class CreateProductNegativeTest {
     @SneakyThrows
     @AfterEach
     void tearDown() {
-        if (id!=0) {
-            Response<ResponseBody> response = productService.deleteProduct(id).execute();
-            assertThat(response.isSuccessful(), CoreMatchers.is(true));
-            id=0;
+        if (id != 0) {
+            assertThat(StepUtils.deleteImagesAfterTests(id).isSuccessful(), CoreMatchers.is(true));
+            id = 0;
         }
-        }
+    }
 
 }

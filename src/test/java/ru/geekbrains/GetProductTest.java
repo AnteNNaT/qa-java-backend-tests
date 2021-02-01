@@ -5,15 +5,17 @@ import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
+
 import static org.hamcrest.Matchers.*;
+
 import ru.geekbrains.dto.Product;
 import ru.geekbrains.enums.Category;
 import ru.geekbrains.service.ProductService;
 import ru.geekbrains.utils.RetrofitUtils;
+import ru.geekbrains.utils.StepUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -30,16 +32,17 @@ public class GetProductTest {
         product1 = new Product()
                 .withTitle(faker.food().ingredient())
                 .withCategoryTitle(Category.FOOD.title)
-                .withPrice((int)(Math.random() * 10000));
-        Response<Product> response =productService.createProduct(product1).execute();
-        id=response.body().getId();
+                .withPrice((int) (Math.random() * 10000));
+        Response<Product> response = productService.createProduct(product1).execute();
+        id = response.body().getId();
     }
 
     @Test
-    void testsChain(){
+    void testsChain() {
         getProductByIdPositiveTest();
         getProductAfterDeletionNegativeTest();
     }
+
     @SneakyThrows
     void getProductByIdPositiveTest() {
         Response<Product> response = productService.getProduct(id).execute();
@@ -57,26 +60,35 @@ public class GetProductTest {
         Response<Product> productResponse = productService.getProduct(id).execute();
         assertThat(productResponse.isSuccessful(), CoreMatchers.is(false));
     }
+
     @SneakyThrows
     @Test
     void getProductByNonExistentIdNegativeTest() {
-        id=(int)(Math.random() * 1000000);
+        id = (int) (Math.random() * 1000000);
         Response<Product> response = productService.getProduct(id).execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
     }
+
     @SneakyThrows
     @Test
     void getProductByNullIdNegativeTest() {
-        id=0;
+        id = 0;
         Response<Product> response = productService.getProduct(id).execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
     }
+
     @SneakyThrows
     @Test
     void getProductByNegativeIdNegativeTest() {
-        id=-(int)(Math.random() * 1000000);
+        id = -(int) (Math.random() * 1000000);
         Response<Product> response = productService.getProduct(id).execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
+    }
+
+    @SneakyThrows
+    @AfterAll
+    static void afterAll() {
+        assertThat(StepUtils.deleteImagesAfterTests(id).isSuccessful(), CoreMatchers.is(true));
     }
 
 }
