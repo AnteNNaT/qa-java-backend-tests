@@ -1,4 +1,4 @@
-package ru.geekbrains;
+package ru.geekbrains.get.products;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;

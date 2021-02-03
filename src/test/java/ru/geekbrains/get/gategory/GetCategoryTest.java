@@ -1,4 +1,4 @@
-package ru.geekbrains;
+package ru.geekbrains.get.gategory;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
