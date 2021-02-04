@@ -1,12 +1,16 @@
-package ru.geekbrains;
+package ru.geekbrains.update.product;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
+import ru.geekbrains.db.dao.ProductsMapper;
+import ru.geekbrains.db.model.ProductsExample;
+import ru.geekbrains.db.utils.MyBatisUtils;
 import ru.geekbrains.dto.Product;
 import ru.geekbrains.enums.Category;
 import ru.geekbrains.service.ProductService;
@@ -20,6 +24,7 @@ import static org.hamcrest.Matchers.*;
 
 public class UpdateProductPositiveTest {
     private static ProductService productService;
+    private static ProductsMapper productsMapper;
     private static Product product1;
     private static Product product2;
     private static Product product3;
@@ -36,6 +41,7 @@ public class UpdateProductPositiveTest {
     static void beforeAll() {
         productService = RetrofitUtils.getRetrofit()
                 .create(ProductService.class);
+        productsMapper = MyBatisUtils.getProductsMapper("mybatis-config.xml");
 
         product1 = new Product()
                 .withTitle(faker.app().name())
@@ -66,6 +72,7 @@ public class UpdateProductPositiveTest {
 
     }
 
+
     @Test
     void UpdateOneFieldInProductChainTest() {
         updateTitleInProductTest();
@@ -89,6 +96,7 @@ public class UpdateProductPositiveTest {
         assertThat(response.body().getTitle(), equalTo(newTitle));
         assertThat(response.body().getPrice(), equalTo(product1.getPrice()));
         assertThat(response.body().getCategoryTitle(), equalTo(product1.getCategoryTitle()));
+        assertThat(productsMapper.selectByPrimaryKey((long) id).getTitle(), equalTo(product1.getTitle()));
     }
 
     @SneakyThrows
@@ -101,6 +109,7 @@ public class UpdateProductPositiveTest {
         assertThat(response.body().getTitle(), equalTo(newTitle));
         assertThat(response.body().getPrice(), equalTo(price));
         assertThat(response.body().getCategoryTitle(), equalTo(product1.getCategoryTitle()));
+        assertThat(productsMapper.selectByPrimaryKey((long) id).getPrice(), equalTo(product1.getPrice()));
     }
 
     @SneakyThrows
@@ -109,10 +118,13 @@ public class UpdateProductPositiveTest {
         Response<Product> response = productService.updateProduct(product1)
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(true));
+        assert response.body() != null;
         assertThat(response.body().getId(), equalTo(id));
         assertThat(response.body().getTitle(), equalTo(newTitle));
         assertThat(response.body().getPrice(), equalTo(price));
         assertThat(response.body().getCategoryTitle(), equalTo(Category.FOOD.title));
+        assertThat(productsMapper.selectByPrimaryKey((long) id).getCategory_id(), equalTo((long) Category.FOOD.id));
+
     }
 
     @Test
@@ -128,6 +140,9 @@ public class UpdateProductPositiveTest {
         assertThat(response.body().getTitle(), equalTo(newTitle));
         assertThat(response.body().getPrice(), equalTo(price));
         assertThat(response.body().getCategoryTitle(), equalTo(Category.ELECTRONIC.title));
+        assertThat(productsMapper.selectByPrimaryKey((long) id2).getTitle(), equalTo(product2.getTitle()));
+        assertThat(productsMapper.selectByPrimaryKey((long) id2).getPrice(), equalTo(product2.getPrice()));
+        assertThat(productsMapper.selectByPrimaryKey((long) id2).getCategory_id(), equalTo(Long.valueOf(Category.ELECTRONIC.id)));
     }
 
     @SneakyThrows
@@ -141,6 +156,7 @@ public class UpdateProductPositiveTest {
         assertThat(response.body().getTitle(), is(nullValue()));
         assertThat(response.body().getPrice(), equalTo(product3.getPrice()));
         assertThat(response.body().getCategoryTitle(), equalTo(product3.getCategoryTitle()));
+        assertThat(productsMapper.selectByPrimaryKey((long) id3).getTitle(), is(nullValue()));
     }
 
     @SneakyThrows
@@ -153,6 +169,7 @@ public class UpdateProductPositiveTest {
         assertThat(response.body().getTitle(), is(nullValue()));
         assertThat(response.body().getPrice(), equalTo(product3.getPrice()));
         assertThat(response.body().getCategoryTitle(), equalTo(product3.getCategoryTitle()));
+        assertThat(productsMapper.selectByPrimaryKey((long) id3).getPrice(), is(0));
     }
 
     @SneakyThrows
@@ -165,14 +182,17 @@ public class UpdateProductPositiveTest {
         assertThat(response.body().getTitle(), is(product1.getTitle()));
         assertThat(response.body().getPrice(), equalTo(product1.getPrice()));
         assertThat(response.body().getCategoryTitle(), equalTo(product1.getCategoryTitle()));
+        assertThat(productsMapper.selectByPrimaryKey((long) id).getTitle(), equalTo(product1.getTitle()));
     }
 
     @SneakyThrows
     @AfterAll
     static void afterAll() {
+        Integer sizeBefore = productsMapper.selectByExample(new ProductsExample()).size();
         assertThat(StepUtils.deleteImagesAfterTests(id).isSuccessful(), CoreMatchers.is(true));
         assertThat(StepUtils.deleteImagesAfterTests(id2).isSuccessful(), CoreMatchers.is(true));
         assertThat(StepUtils.deleteImagesAfterTests(id3).isSuccessful(), CoreMatchers.is(true));
+        assertThat(productsMapper.selectByExample(new ProductsExample()).size(), equalTo(sizeBefore - 3));
     }
 
 

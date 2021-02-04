@@ -1,4 +1,4 @@
-package ru.geekbrains;
+package ru.geekbrains.create.product;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
@@ -75,7 +75,7 @@ public class CreateProductNegativeTest {
         Response<Product> response = productService.createProduct(product1)
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
-        assertThat(response.code(),is(500));
+        assertThat(response.code(), is(500));
     }
 
     @Test

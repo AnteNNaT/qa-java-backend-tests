@@ -23,7 +23,7 @@ public class MyBatisUtils {
     private static SqlSession getSqlSession(String resource) throws IOException {
         InputStream inputStream = Resources.getResourceAsStream(resource);
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        SqlSession session = sqlSessionFactory.openSession();
+        SqlSession session = sqlSessionFactory.openSession(true);
         return session;
     }
 }

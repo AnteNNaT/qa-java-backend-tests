@@ -1,4 +1,4 @@
-package ru.geekbrains;
+package ru.geekbrains.delete.product;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
@@ -37,7 +37,7 @@ public class DeleteProductNegativeTest {
 
     @Test
     @SneakyThrows
-    void deleteProductWithOutIdTest() {
+    void deleteProductWithOutIdNegativeTest() {
         Response<Product> response = productService.updateProduct(product1)
                 .execute();
         assertThat(response.isSuccessful(), CoreMatchers.is(false));
@@ -45,7 +45,7 @@ public class DeleteProductNegativeTest {
 
     @Test
     @SneakyThrows
-    void deleteProductWithNonExistentIdTest() {
+    void deleteProductWithNonExistentIdNegativeTest() {
         product1.setId((int) (Math.random() * 1000000));
         Response<Product> response = productService.updateProduct(product1)
                 .execute();
@@ -54,7 +54,7 @@ public class DeleteProductNegativeTest {
 
     @Test
     @SneakyThrows
-    void deleteProductWithNullIdTest() {
+    void deleteProductWithNullIdNegativeTest() {
         product1.setId(0);
         Response<Product> response = productService.updateProduct(product1)
                 .execute();
