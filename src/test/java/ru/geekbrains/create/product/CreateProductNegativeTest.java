@@ -6,6 +6,7 @@ import okhttp3.ResponseBody;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
 import ru.geekbrains.dto.ErrorResponse;
@@ -21,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
+@DisplayName("Check POST market/api/v1/products/ (negative tests)")
 public class CreateProductNegativeTest {
     private static ProductService productService;
     private static Product product1;
@@ -71,6 +73,7 @@ public class CreateProductNegativeTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Check creation product with non-existent category")
     void createProductInNonExistCategoryTest() {
         Response<Product> response = productService.createProduct(product1)
                 .execute();
@@ -80,6 +83,7 @@ public class CreateProductNegativeTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Check creation product with ID category instead category title")
     void createProductWithIdCategoryTest() {
         Response<Product> response = productService.createProduct(product2)
                 .execute();
@@ -89,6 +93,7 @@ public class CreateProductNegativeTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Check creation product with product ID into request")
     void createProductWithIdProductTest() {
         Response<ResponseBody> response = productService.createProductWithError(product3)
                 .execute();
@@ -100,6 +105,7 @@ public class CreateProductNegativeTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Check creation product with empty category title")
     void createProductWithEmptyCategoryTest() {
         Response<Product> response = productService.createProduct(product5)
                 .execute();
@@ -108,6 +114,7 @@ public class CreateProductNegativeTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Check creation product with too long title")
     void createProductWithTooLongTitleTest() {
         Response<Product> response = productService.createProduct(product6)
                 .execute();
@@ -116,6 +123,7 @@ public class CreateProductNegativeTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Check creation product with negative price")
     void createProductWithNegativePriceTest() {
         Response<Product> response = productService.createProduct(product7)
                 .execute();
@@ -125,6 +133,7 @@ public class CreateProductNegativeTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Check creation product with too long price")
     void createProductWithTooLongPriceTest() {
         Response<ProductWithDoublePrice> response = productService.createProductWithDoublePrice(product8)
                 .execute();
